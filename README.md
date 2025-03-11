@@ -3,25 +3,54 @@ bq-kitchen-sync
 
 This is a fork of the original Kitchen Sync gem, upgraded for Ruby 3.2+
 
-Do you wish your test-kitchen runs were faster? Do I ever have the gem for you!
+Does transferring files in test-kitchen take too long?
+```
+       Transferring files to <chef18-ubuntu>
+```
 
-kitchen-sync provides alternate file transfer implementations for test-kitchen,
-most of which are faster than the default, thus speeding up your test runs.
+Do I ever have the gem for you!
+
+bq-kitchen-sync implements alternate `rsync` and `sftp` transports for test-kitchen, speeding up file transfers significantly. Wait seconds, not minutes.
 
 Quick Start
 -----------
 
-Run `chef gem install bq-kitchen-sync --source "https://github.com/BuyerQuest/kitchen-sync.git"` and then set your transport to `sftp` or `rsync`:
+Run this to add the gem to your chef's ruby:
+
+```shell
+chef gem install bq-kitchen-sync --source "https://github.com/BuyerQuest/kitchen-sync.git"
+```
+
+If you're using test-kitchen through bundler instead, add this to your Gemfile:
+```
+gem 'bq-kitchen-sync', github: 'BuyerQuest/bq-kitchen-sync'
+```
+
+and then set the transport to `rsync` in your kitchen.yml file.
+
+
+Available Transfer Methods
+--------------------------
+
+### `rsync`
+
+```
+transport:
+  name: rsync
+```
+
+This is the fastest mode.
+
+* You must be using `ssh-agent` with an identity loaded.
+* `rsync` must be available on the remote side.
+* * Use a test-kitchen [lifecycle hook](https://kitchen.ci/docs/reference/lifecycle-hooks/) to install it.
+
+### `sftp`
 
 ```
 transport:
   name: sftp
 ```
-
-Available Transfer Methods
---------------------------
-
-### `sftp`
 
 The default mode uses SFTP for file transfers, as well as a helper script to
 avoid recopying files that are already present on the test host. If SFTP is
@@ -35,14 +64,6 @@ transport:
   name: sftp
   ruby_path: /usr/bin/ruby
 ```
-
-### `rsync`
-
-The Rsync mode is based on the work done by [Mikhail Bautin](https://github.com/test-kitchen/test-kitchen/pull/359).
-This is the fastest mode, but it does have a few downsides. The biggest is that
-you must be using `ssh-agent` and have an identity loaded for it to use. It also
-requires that rsync be available on the remote side. Consider this implementation
-more experimental than `sftp` at this time.
 
 License
 -------
