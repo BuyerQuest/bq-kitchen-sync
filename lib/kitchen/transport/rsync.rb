@@ -49,7 +49,7 @@ module Kitchen
 
       class Connection < Ssh::Connection
         def upload(locals, remote)
-          if @rsync_failed || !File.exists?('/usr/bin/rsync')
+          if @rsync_failed || !File.exist?('/usr/bin/rsync')
             logger.debug('[rsync] Rsync already failed or not installed, not trying it')
             return super
           end

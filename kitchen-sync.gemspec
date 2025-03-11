@@ -4,13 +4,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'kitchen-sync/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'kitchen-sync'
+  spec.name          = 'bq-kitchen-sync'
   spec.version       = KitchenSync::VERSION
-  spec.authors       = ['Noah Kantrowitz']
-  spec.email         = ['noah@coderanger.net']
+  spec.authors       = ['Andrew Bobulsky', 'Noah Kantrowitz']
+  spec.email         = ['devops@buyerquest.com']
   spec.description   = %q{Improved file transfers for for test-kitchen}
   spec.summary       = spec.description
-  spec.homepage      = 'https://github.com/coderanger/kitchen-sync'
+  spec.homepage      = 'https://github.com/BuyerQuest/kitchen-sync'
   spec.license       = 'Apache 2.0'
 
   spec.files         = `git ls-files`.split($/)
