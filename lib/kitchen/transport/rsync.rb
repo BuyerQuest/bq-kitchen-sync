@@ -55,31 +55,25 @@ module Kitchen
           end
 
           locals = Array(locals)
-          # We only try to sync folders for now and ignore the cache folder
-          # because we don't want to --delete that.
-          rsync_candidates = locals.select {|path| File.directory?(path) && File.basename(path) != 'cache' }
           ssh_command = "ssh #{ssh_args.join(' ')}"
           copy_identity
-          rsync_cmd = "/usr/bin/rsync -e '#{ssh_command}' -az#{logger.level == :debug ? 'vv' : ''} --delete #{rsync_candidates.join(' ')} #{@session.options[:user]}@#{@session.host}:#{remote}"
+          rsync_cmd = "/usr/bin/rsync -e '#{ssh_command}' -rltz#{logger.level == :debug ? 'vv' : ''} #{locals.join(' ')} #{@session.options[:user]}@#{@session.host}:#{remote}"
           logger.debug("[rsync] Running rsync command: #{rsync_cmd}")
           ret = []
           time = Benchmark.realtime do
             ret << system(rsync_cmd)
           end
-          logger.info("[rsync] Time taken to upload #{rsync_candidates.join(';')} to #{self}:#{remote}: %.2f sec" % time)
+          logger.info("[rsync] Time taken to upload #{locals.join(';')} to #{self}:#{remote}: %.2f sec" % time)
           unless ret.first
             logger.warn("[rsync] rsync exited with status #{$?.exitstatus}, using SCP instead")
             @rsync_failed = true
           end
 
           # Fall back to SCP
-          remaining = if @rsync_failed
-            locals
-          else
-            locals - rsync_candidates
+          if @rsync_failed
+            logger.debug("[rsync] Using fallback to upload #{remaining.join(';')}")
+            super(locals, remote)
           end
-          logger.debug("[rsync] Using fallback to upload #{remaining.join(';')}")
-          super(remaining, remote) unless remaining.empty?
         end
 
         # Copy your SSH identity, creating a new one if needed

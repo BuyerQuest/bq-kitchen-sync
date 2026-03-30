@@ -1,5 +1,13 @@
 # Kitchen-Sync Changelog
 
+## v2.4.0
+
+Fixed a bug in the file transfer logic that was preventing files from copying on some test-kitchen runs, leading to long SCP-fallback transfers.
+
+## v2.3.0
+
+Ruby 3.2+ compatibility
+
 ## v2.2.1
 
 Fix compatibility with current `kitchen-inspec` verifier.
