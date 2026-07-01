@@ -16,6 +16,7 @@
 
 require 'base64'
 require 'benchmark'
+require 'shellwords'
 
 require 'kitchen/transport/ssh'
 require 'net/ssh'
@@ -56,13 +57,20 @@ module Kitchen
           end
 
           locals = Array(locals)
-          ssh_command = "ssh #{ssh_args.join(' ')}"
+          ssh_command = rsync_ssh_command
           copy_identity
-          rsync_cmd = "/usr/bin/rsync -e '#{ssh_command}' -rltz#{logger.level == :debug ? 'vv' : ''} #{locals.join(' ')} #{@session.options[:user]}@#{@session.host}:#{remote}"
-          logger.debug("[rsync] Running rsync command: #{rsync_cmd}")
+          rsync_cmd = [
+            '/usr/bin/rsync',
+            '-e',
+            ssh_command,
+            "-rltz#{logger.level == :debug ? 'vv' : ''}",
+            *locals,
+            "#{username}@#{hostname}:#{remote}",
+          ]
+          logger.debug("[rsync] Running rsync command: #{Shellwords.join(rsync_cmd)}")
           ret = []
           time = Benchmark.realtime do
-            ret << system(rsync_cmd)
+            ret << system(*rsync_cmd)
           end
           logger.info("[rsync] Time taken to upload #{locals.join(';')} to #{self}:#{remote}: %.2f sec" % time)
           unless ret.first
@@ -96,14 +104,24 @@ module Kitchen
           @copied_identity = true
         end
 
-        def ssh_args
-          args = %W{ -o UserKnownHostsFile=/dev/null }
-          args += %W{ -o StrictHostKeyChecking=no }
-          args += %W{ -o IdentitiesOnly=yes } if @options[:keys]
-          args += %W{ -o LogLevel=#{@logger.debug? ? "VERBOSE" : "ERROR"} }
-          args += %W{ -o ForwardAgent=#{options[:forward_agent] ? "yes" : "no"} } if @options.key? :forward_agent
-          Array(@options[:keys]).each { |ssh_key| args += %W{ -i #{ssh_key}} }
-          args += %W{ -p #{@session.options[:port]}}
+        def rsync_ssh_command
+          command = login_command
+          args = command.arguments.dup
+          args.pop
+
+          [command.command, *args].map { |arg| shell_escape_ssh_arg(arg) }.join(' ')
+        end
+
+        def shell_escape_ssh_arg(arg)
+          if arg.start_with?('ProxyCommand=')
+            "ProxyCommand=#{shell_single_quote(arg.delete_prefix('ProxyCommand='))}"
+          else
+            Shellwords.escape(arg).gsub('\=', '=')
+          end
+        end
+
+        def shell_single_quote(value)
+          "'#{value.gsub("'", "'\"'\"'")}'"
         end
       end
 
