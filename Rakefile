@@ -26,3 +26,10 @@ Rake::TestTask.new do |t|
 end
 
 task default: :test
+
+namespace :integration do
+  desc 'Run the Test Kitchen integration suite against EC2 over SSM'
+  task :kitchen do
+    sh 'bundle exec kitchen test'
+  end
+end

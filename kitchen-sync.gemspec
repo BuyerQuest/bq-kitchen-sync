@@ -13,16 +13,20 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/BuyerQuest/kitchen-sync'
   spec.license       = 'Apache 2.0'
 
-  spec.files         = `git ls-files`.split($/)
+  spec.files         = `git ls-files`.split($/).grep(%r{\A(?:lib/|CHANGELOG\.md|Gemfile|LICENSE|README\.md|Rakefile|kitchen-sync\.gemspec)})
   spec.executables   = []
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = []
   spec.require_paths = ['lib']
 
   spec.add_dependency 'benchmark'
-  spec.add_dependency 'net-sftp'
-  spec.add_dependency 'test-kitchen', '>= 1.0.0'
+  spec.add_dependency 'net-sftp', '>= 4.0.0'
+  spec.add_dependency 'net-ssh', '>= 7.0', '< 8.0'
+  spec.add_dependency 'test-kitchen', '~> 4.0'
 
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'kitchen-ec2', '~> 3.22'
+  spec.add_development_dependency 'kitchen-cinc', '~> 1.1'
+  spec.add_development_dependency 'kitchen-inspec'
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'rake'
 end

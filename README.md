@@ -66,6 +66,49 @@ transport:
   ruby_path: /usr/bin/ruby
 ```
 
+Integration Tests
+-----------------
+
+This repository includes a Test Kitchen integration fixture that runs against
+Amazon Linux 2 and Amazon Linux 2023 EC2 instances over AWS Systems Manager
+Session Manager.
+
+These tests are primarily intended for the gem author, using the AWS account and
+IAM instance profile already set up for this project. They may also be useful to
+other contributors if the `test-kitchen-ec2-role` IAM instance profile is created
+in their account, or if `.kitchen.yml` is adjusted to use an equivalent role.
+
+Prerequisites:
+
+* AWS credentials for the target account, typically selected with `AWS_PROFILE`.
+* The AWS Session Manager plugin installed locally.
+* The `test-kitchen-ec2-role` EC2 instance profile, or an equivalent role
+  configured in `.kitchen.yml`, with permissions for SSM access.
+
+Install the bundle, select the AWS account with your normal AWS environment, and
+run Kitchen:
+
+```shell
+bundle install
+AWS_PROFILE=bqsandbox bundle exec kitchen test
+```
+
+The development bundle uses Test Kitchen 4.x with `kitchen-cinc`, so Cinc Client
+installation is handled by the dedicated Cinc provisioner instead of pulling in
+Chef Workstation libraries directly.
+
+The Kitchen driver is configured for `t3.small` instances and the
+`test-kitchen-ec2-role` IAM instance profile.
+
+You can also run the same command through Rake:
+
+```shell
+AWS_PROFILE=bqsandbox bundle exec rake integration:kitchen
+```
+
+The `sftp` and `rsync` suites both converge a tiny fixture cookbook and verify
+that files uploaded through the selected transport landed on the instance.
+
 License
 -------
 

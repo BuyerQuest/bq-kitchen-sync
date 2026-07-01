@@ -1,0 +1,1 @@
+This file is delivered through the Test Kitchen transport under test.

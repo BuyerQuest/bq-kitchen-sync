@@ -1,0 +1,5 @@
+name: bq-kitchen-sync-default
+title: bq-kitchen-sync Test Kitchen integration
+version: 0.1.0
+supports:
+  - platform-family: amazon

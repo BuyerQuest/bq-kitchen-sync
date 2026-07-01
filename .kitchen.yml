@@ -1,0 +1,63 @@
+---
+driver:
+  name: ec2
+  instance_type: t3.small
+  skip_cost_warning: true
+  use_ssm_session_manager: true
+  ssm_session_manager_document_name: AWS-StartSSHSession
+  iam_profile_name: test-kitchen-ec2-role
+  tags:
+    created-by: test-kitchen
+    project: bq-kitchen-sync
+  block_device_mappings:
+    - device_name: /dev/xvda
+      ebs:
+        volume_size: 16
+        volume_type: gp3
+        delete_on_termination: true
+
+provisioner:
+  name: cinc_infra
+  product_version: 18
+  install_strategy: once
+  always_update_cookbooks: true
+
+verifier:
+  name: inspec
+  sudo: true
+  inspec_tests:
+    - test/integration/default
+
+platforms:
+  - name: amazon2
+    driver:
+      image_search:
+        owner-id: "137112412989"
+        name: amzn2-ami-hvm-2.0.*-x86_64-gp2
+    lifecycle:
+      post_create:
+        - remote: sudo yum install -y rsync
+
+  - name: amazon2023
+    driver:
+      image_search:
+        owner-id: "137112412989"
+        name: al2023-ami-2023.*-x86_64
+    lifecycle:
+      post_create:
+        - remote: sudo dnf install -y rsync
+
+suites:
+  - name: sftp
+    run_list:
+      - recipe[sync_probe::default]
+    transport:
+      name: sftp
+      ruby_path: /opt/cinc/embedded/bin/ruby
+
+  - name: rsync
+    run_list:
+      - recipe[sync_probe::default]
+    transport:
+      name: rsync
+      forward_agent: true
