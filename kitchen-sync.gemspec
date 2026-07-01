@@ -21,9 +21,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'benchmark'
   spec.add_dependency 'net-sftp', '>= 4.0.0'
   spec.add_dependency 'net-ssh', '>= 7.0', '< 8.0'
-  spec.add_dependency 'test-kitchen', '~> 4.0'
+  spec.add_dependency 'test-kitchen', '>= 1.0.0'
 
   spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'test-kitchen', '~> 4.0'
   spec.add_development_dependency 'kitchen-ec2', '~> 3.22'
   spec.add_development_dependency 'kitchen-cinc', '~> 1.1'
   spec.add_development_dependency 'kitchen-inspec'
