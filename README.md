@@ -42,8 +42,9 @@ transport:
 This is the fastest mode.
 
 * You must be using `ssh-agent` with an identity loaded.
-* `rsync` must be available on the remote side.
-* * Use a test-kitchen [lifecycle hook](https://kitchen.ci/docs/reference/lifecycle-hooks/) to install it.
+* `rsync` must be available on the remote side for the fastest upload path.
+  Use a test-kitchen [lifecycle hook](https://kitchen.ci/docs/reference/lifecycle-hooks/) to install it.
+* Failed `rsync` upload attempts fall back to Test Kitchen's SCP upload.
 
 ### `sftp`
 

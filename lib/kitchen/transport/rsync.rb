@@ -15,6 +15,7 @@
 #
 
 require 'base64'
+require 'benchmark'
 
 require 'kitchen/transport/ssh'
 require 'net/ssh'
@@ -71,7 +72,7 @@ module Kitchen
 
           # Fall back to SCP
           if @rsync_failed
-            logger.debug("[rsync] Using fallback to upload #{remaining.join(';')}")
+            logger.debug("[rsync] Using fallback to upload #{locals.join(';')}")
             super(locals, remote)
           end
         end
